@@ -1,7 +1,7 @@
 
 # 📊 Projeto Streamlit com Docker - Mapa de Calor!
 
-Este projeto é um aplicativo Streamlit containerizado com Docker, projetado para criar um mapa de calor com base em dados de latitude, longitude e concentração de pedidos. A seguir está uma breve descrição do projeto:
+Este projeto é um aplicativo Streamlit containerizado com Docker, projetado para criar um mapa de calor com base em dados de latitude, longitude e concentração de pedidos.
 
 ## 🚀 Início Rápido
 
