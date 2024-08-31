@@ -4,4 +4,4 @@ COPY . /src
 WORKDIR /src
 RUN poetry install
 EXPOSE 8501
-ENTRYPOINT ["poetry", "run", "streamlit", "run", "src/01_atualizar_banco_de_dados.py", "--server.port=8501", "--server.address=0.0.0.0"]
+ENTRYPOINT ["poetry", "run", "streamlit", "run", "src/01_mapa_de_calor.py", "--server.port=8501", "--server.address=0.0.0.0"]

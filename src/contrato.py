@@ -8,4 +8,5 @@ class Orders(BaseModel):
     origin_latitude: float
     origin_longitude: float
     Pedidos: int
+    shift: str
 

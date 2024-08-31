@@ -42,7 +42,7 @@ O aplicativo Streamlit estará disponível em seu navegador no endereço: [http:
 
 ### 📂 Estrutura do Projeto
 
-- **src/01_atualizar_banco_de_dados.py**: Arquivo principal do aplicativo Streamlit.
+- **src/01_mapa_de_calor.py**: Arquivo principal do aplicativo Streamlit.
 - **Dockerfile**: Script de configuração para construir a imagem Docker.
 - **pyproject.toml**: Arquivo de configuração do Poetry com as dependências do projeto.
 
