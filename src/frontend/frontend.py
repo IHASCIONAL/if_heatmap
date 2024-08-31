@@ -32,8 +32,32 @@ class Forms:
         return st.form_submit_button(name)
         
     def create_forms(self, title):
+        # Adiciona o CSS personalizado para estilizar o form
+        st.markdown(
+            """
+            <style>
+            .form-title {
+                font-size: 30px;
+                font-weight: bold;
+                color: #CE0809; /* Alterar cor para algo mais atraente */
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .stButton > button {
+                background-color: #FF6347;
+                color: white;
+                border-radius: 10px;
+                width: 100%;
+                padding: 10px 20px;
+                margin-top: 10px;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
         with st.form("form"):
-            self.form_title(title)
+            st.markdown(f'<div class="form-title">{title}</div>', unsafe_allow_html=True)
+            #self.form_title(title)
 
             col1, col2 = st.columns(2)
 
@@ -60,10 +84,6 @@ class Forms:
                 heatmap_map = heatmap_generator.create_heatmap()
                 st.components.v1.html(heatmap_map._repr_html_(), height=600)
 
-
-
-
-    
 
 class ExcelValidatorUI:
 
