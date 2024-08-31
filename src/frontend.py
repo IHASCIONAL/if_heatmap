@@ -30,14 +30,14 @@ class ExcelValidatorUI:
 
     def set_page_config(self):
         st.set_page_config(
-            page_title="Validador de schema excel"
+            page_title="Interface para atualizar o mapa de calor"
         )
 
     def display_header(self):
-        st.title("Validador de schema excel")
+        st.title("Atualizar Mapa de Calor")
 
     def upload_file(self):
-        return st.file_uploader("Carregue seu arquivo aqui", type=["xlsx", "csv"])
+        return st.file_uploader("Carregue o arquivo atualizado aqui", type=["xlsx", "csv"])
     
     def display_results(self, result ,erros):
         if erros:
