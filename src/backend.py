@@ -2,56 +2,29 @@ import pandas as pd
 from contrato import Orders
 from pydantic import ValidationError
 
-class FileTypeIdentifier:
-    def __init__(self):
-        self.dtype = 'unknown'
-
-    def identify(self, uploaded_file):
-        """
-        Identifica o tipo de arquivo com base no conteúdo do arquivo carregado.
-
-        Args:
-            uploaded_file (UploadedFile): O arquivo carregado via Streamlit.
-
-        Returns:
-            str: Tipo do arquivo ('csv', 'xlsx', ou 'unknown').
-        """
-        try:
-            # Tenta ler o arquivo como um CSV
-            pd.read_csv(uploaded_file)
-            self.dtype = 'csv'
-        except Exception:
-            try:
-                # Tenta ler o arquivo como um Excel
-                pd.read_excel(uploaded_file)
-                self.dtype = 'xlsx'
-            except Exception:
-                self.dtype = 'unknown'
-        
-        return self.dtype
-
 class FileLoader:
     def __init__(self):
         self.dataframe = pd.DataFrame()
 
-    def load(self, uploaded_file, dtype):
+    def load(self, uploaded_file):
         """
         Carrega o arquivo com base no tipo identificado.
 
         Args:
             uploaded_file (UploadedFile): O arquivo carregado via Streamlit.
-            dtype (str): Tipo do arquivo ('csv' ou 'xlsx').
 
         Returns:
             DataFrame: DataFrame carregado ou DataFrame vazio em caso de erro.
         """
         try:
-            if dtype == 'csv':
+            # Verifica o tipo do arquivo pelo seu nome ou extensão
+            if uploaded_file.name.endswith('.csv'):
                 self.dataframe = pd.read_csv(uploaded_file)
-            elif dtype == 'xlsx':
+            elif uploaded_file.name.endswith('.xlsx') or uploaded_file.name.endswith('.xls'):
                 self.dataframe = pd.read_excel(uploaded_file)
             else:
-                raise ValueError("Tipo de arquivo desconhecido.")
+                raise ValueError("Formato de arquivo não suportado. Por favor, carregue um arquivo CSV ou Excel.")
+
         except Exception as e:
             print(f"Erro ao carregar o arquivo: {str(e)}")
             self.dataframe = pd.DataFrame()
@@ -100,7 +73,6 @@ class DataFrameValidator:
 
 class ProcessDataController:
     def __init__(self):
-        self.file_type_identifier = FileTypeIdentifier()
         self.file_loader = FileLoader()
         self.dataframe_validator = DataFrameValidator()
 
@@ -114,13 +86,8 @@ class ProcessDataController:
         Returns:
             Tuple: (DataFrame, bool, List) ou (DataFrame vazio, str) em caso de erro.
         """
-        # Identificar o tipo de arquivo
-        file_type = self.file_type_identifier.identify(uploaded_file)
-        if file_type == 'unknown':
-            return pd.DataFrame(), False, "Tipo de arquivo desconhecido."
-
         # Carregar o arquivo
-        dataframe = self.file_loader.load(uploaded_file, file_type)
+        dataframe = self.file_loader.load(uploaded_file)
         if dataframe.empty:
             return pd.DataFrame(), False, "Erro ao carregar o arquivo."
 
