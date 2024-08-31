@@ -1,5 +1,5 @@
-from frontend import ExcelValidatorUI
-from backend import ProcessDataController, RefreshDataBase
+from frontend.frontend import ExcelValidatorUI
+from backend.backend import ProcessDataController, RefreshDataBase
 import sentry_sdk
 
 sentry_sdk.init(

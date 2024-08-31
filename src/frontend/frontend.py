@@ -1,26 +1,26 @@
 import streamlit as st
-from dotenv import load_dotenv
-import os
-
-load_dotenv(".env")
-
-# Configuração da conexão com o banco de dados
-POSTGRES_USER = os.getenv('POSTGRES_USER')
-POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
-POSTGRES_HOST = os.getenv('POSTGRES_HOST')
-POSTGRES_PORT = os.getenv('POSTGRES_PORT')
-POSTGRES_DB = os.getenv('POSTGRES_DB')
-
-DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+import requests
+from backend.backend import HeatMapGenerator, DataFetcher
 
 class Forms:
 
     def __init__(self):
         self.estado = None
         self.shift = None
+    
+    def fetch_logistic_regions(self):
+        try:
+            response = requests.get('http://localhost:5000/logistic-regions')  # URL do seu endpoint Flask
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            st.error(f"Erro ao carregar as regiões logísticas: {str(e)}")
+            return []
 
     def define_state(self):
-        self.estado = st.selectbox(label="Selecione a praça de interesse para ver o mapa de calor", options=["Rio de Janeiro", "SP"])
+        logistic_regions = self.fetch_logistic_regions()
+        if logistic_regions:
+            self.estado = st.selectbox(label="Selecione a praça de interesse para ver o mapa de calor", options=logistic_regions)
 
     def define_shift(self):
         self.shift = st.selectbox(label="Selecione o turno", options=['MANHA', 'ALMOCO', 'TARDE', 'CEIA', 'JANTAR', 'MADRUGADA'])
@@ -45,7 +45,25 @@ class Forms:
             submitted = self.submit_button("Ver Mapa")
 
             if submitted:
-                st.write(f"Praça selecionada: {self.estado}")
+                st.write(f"Praça selecionada: {self.estado}""")
+                st.write(f"Turno selecionado: {self.shift}")
+
+                data_fetcher = DataFetcher()
+                df = data_fetcher.fetch_all_data()
+
+                filtered_df = df[
+                    (df['logistic_region'] == self.estado)&
+                    (df['shift'] == self.shift)
+                    ]
+                
+                heatmap_generator = HeatMapGenerator(filtered_df)
+                heatmap_map = heatmap_generator.create_heatmap()
+                st.components.v1.html(heatmap_map._repr_html_(), height=600)
+
+
+
+
+    
 
 class ExcelValidatorUI:
 

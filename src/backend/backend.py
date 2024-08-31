@@ -1,24 +1,10 @@
 import pandas as pd
-from contrato import Orders
+from backend.contrato import Orders
 from pydantic import ValidationError
-# from dotenv import load_dotenv
-# import os
 import folium
 from folium.plugins import HeatMap
-from config import get_database_connection
+from backend.config import get_database_connection
 
-
-# load_dotenv(".env")
-
-# # Lê as variáveis de ambiente
-# POSTGRES_USER = os.getenv('POSTGRES_USER')
-# POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
-# POSTGRES_HOST = os.getenv('POSTGRES_HOST')
-# POSTGRES_PORT = os.getenv('POSTGRES_PORT')
-# POSTGRES_DB = os.getenv('POSTGRES_DB')
-
-# # Cria a URL de conexão com o banco de dados
-# DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 
 class FileLoader:
     def __init__(self):
@@ -115,12 +101,30 @@ class ProcessDataController:
         return validated_df, is_valid, errors
 
 class RefreshDataBase:
-    
+
     def refresh_database(self, df):
         # Obter a conexão com o banco de dados
         engine = get_database_connection()
         with engine.connect() as conn:
             df.to_sql("orders", con=conn, if_exists='replace', index=False)
+
+class DataFetcher:
+    def __init__(self):
+        self.engine = get_database_connection()
+
+    def _execute_query(self, query):
+        """Executes a SQL query and returns the result as a DataFrame."""
+        with self.engine.connect() as conn:
+            return pd.read_sql(query, conn)
+
+    def fetch_all_data(self):
+        query = "SELECT * FROM orders;"
+        return self._execute_query(query)
+
+    def fetch_logistic_regions(self):
+        query = "SELECT DISTINCT logistic_region FROM orders;"
+        df = self._execute_query(query)
+        return df['logistic_region'].tolist()
 
 
 class HeatMapGenerator:
