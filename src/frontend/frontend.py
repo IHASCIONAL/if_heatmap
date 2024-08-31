@@ -1,6 +1,8 @@
 import streamlit as st
-import requests
 from backend.backend import HeatMapGenerator, DataFetcher
+
+
+data_fetcher = DataFetcher()
 
 class Forms:
 
@@ -9,13 +11,7 @@ class Forms:
         self.shift = None
     
     def fetch_logistic_regions(self):
-        try:
-            response = requests.get('http://localhost:5000/logistic-regions')  # URL do seu endpoint Flask
-            response.raise_for_status()
-            return response.json()
-        except Exception as e:
-            st.error(f"Erro ao carregar as regiões logísticas: {str(e)}")
-            return []
+        return data_fetcher.fetch_logistic_regions()
 
     def define_state(self):
         logistic_regions = self.fetch_logistic_regions()
