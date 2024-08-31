@@ -1,21 +1,24 @@
 import pandas as pd
 from contrato import Orders
 from pydantic import ValidationError
-from dotenv import load_dotenv
-import os
+# from dotenv import load_dotenv
+# import os
+import folium
+from folium.plugins import HeatMap
+from config import get_database_connection
 
 
-load_dotenv(".env")
+# load_dotenv(".env")
 
-# Lê as variáveis de ambiente
-POSTGRES_USER = os.getenv('POSTGRES_USER')
-POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
-POSTGRES_HOST = os.getenv('POSTGRES_HOST')
-POSTGRES_PORT = os.getenv('POSTGRES_PORT')
-POSTGRES_DB = os.getenv('POSTGRES_DB')
+# # Lê as variáveis de ambiente
+# POSTGRES_USER = os.getenv('POSTGRES_USER')
+# POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
+# POSTGRES_HOST = os.getenv('POSTGRES_HOST')
+# POSTGRES_PORT = os.getenv('POSTGRES_PORT')
+# POSTGRES_DB = os.getenv('POSTGRES_DB')
 
-# Cria a URL de conexão com o banco de dados
-DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+# # Cria a URL de conexão com o banco de dados
+# DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 
 class FileLoader:
     def __init__(self):
@@ -114,4 +117,35 @@ class ProcessDataController:
 class RefreshDataBase:
     
     def refresh_database(self, df):
-        df.to_sql("orders", con=DATABASE_URL, if_exists='replace', index=False)
+        # Obter a conexão com o banco de dados
+        engine = get_database_connection()
+        with engine.connect() as conn:
+            df.to_sql("orders", con=conn, if_exists='replace', index=False)
+
+
+class HeatMapGenerator:
+
+    def __init__(self, df):
+        self.df = df
+        self.central_lat = None
+        self.central_lon = None
+        self.map = None
+
+    def get_mean_lat_lon(self):
+        # Inicializar o mapa
+        self.central_lat = self.df['origin_latitude'].mean()
+        self.central_lon = self.df['origin_longitude'].mean()
+    
+    def initialize_map(self):
+        self.map = folium.Map(location=[self.central_lat, self.central_lon], zoom_start=12)
+    
+    def generate_map(self):
+        heat_data = [[row['origin_latitude'], row['origin_longitude'], row['Pedidos']] for index, row in self.df.iterrows()]
+        HeatMap(heat_data).add_to(self.map)
+
+    def create_heatmap(self):
+        # Executar a criação do mapa e do heatmap
+        self.get_mean_lat_lon()
+        self.initialize_map()
+        self.generate_map()
+        return self.map

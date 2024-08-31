@@ -1,12 +1,29 @@
 import streamlit as st
+from dotenv import load_dotenv
+import os
+
+load_dotenv(".env")
+
+# Configuração da conexão com o banco de dados
+POSTGRES_USER = os.getenv('POSTGRES_USER')
+POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
+POSTGRES_HOST = os.getenv('POSTGRES_HOST')
+POSTGRES_PORT = os.getenv('POSTGRES_PORT')
+POSTGRES_DB = os.getenv('POSTGRES_DB')
+
+DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 
 class Forms:
 
     def __init__(self):
         self.estado = None
+        self.shift = None
 
     def define_state(self):
         self.estado = st.selectbox(label="Selecione a praça de interesse para ver o mapa de calor", options=["Rio de Janeiro", "SP"])
+
+    def define_shift(self):
+        self.shift = st.selectbox(label="Selecione o turno", options=['MANHA', 'ALMOCO', 'TARDE', 'CEIA', 'JANTAR', 'MADRUGADA'])
     
     def form_title(self, title):
         st.header(title)
@@ -17,7 +34,14 @@ class Forms:
     def create_forms(self, title):
         with st.form("form"):
             self.form_title(title)
-            self.define_state()
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                self.define_state()
+            with col2:
+                self.define_shift()
+            
             submitted = self.submit_button("Ver Mapa")
 
             if submitted:
