@@ -16,6 +16,7 @@ python-dotenv = "^1.0.1"
 sentry-sdk = "^2.13.0"
 sqlalchemy = "^2.0.32"
 psycopg2-binary = "^2.9.9"
+pytest = "^8.3.2"
 
 
 [tool.poetry.group.dev.dependencies]

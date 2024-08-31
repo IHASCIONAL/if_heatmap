@@ -1,0 +1,23 @@
+name: ci
+on: pull_request
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o repositório
+        uses: actions/checkout@v4
+
+      - name: Instalar o Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12.5
+
+      - name: Instalar Poetry
+        run: pip install poetry
+         
+      - name: Instalar dependências
+        run: poetry install
+
+    #   - name: Rodar rotina de testes
+    #     run: poetry run pytest src/tests/test_contrato.py
